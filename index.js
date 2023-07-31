@@ -9,6 +9,10 @@ app.use(bodyParser.json());
 const port = 3000;
 let customerId;
 
+app.get("/",async(req, res)=>{
+  console.log("hello i am here");
+})
+
 app.listen(port, () => console.log(`Hello word  listening on port ${port}!`));
 
 try {
