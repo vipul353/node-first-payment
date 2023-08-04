@@ -9,9 +9,9 @@ app.use(bodyParser.json());
 const port = 3000;
 let customerId;
 
-app.get("/",async(req, res)=>{
+app.get("/", async (req, res) => {
   console.log("hello i am here");
-})
+});
 
 app.listen(port, () => console.log(`Hello word  listening on port ${port}!`));
 
@@ -19,6 +19,41 @@ try {
 } catch (error) {}
 app.post("/payment-sheet", async (req, res) => {
   // Use an existing Customer ID if this is a returning customer.
+  const paymenMethodsType = [
+    // "acss_debit",
+    // "affirm",
+    // "afterpay_clearpay",
+    // "alipay",
+    // "au_becs_debit",
+    // "bacs_debit",
+    // "bancontact",
+    // "blik",
+    // "boleto",
+    "card",
+    // "card_present",
+    // "cashapp",
+    // "customer_balance",
+    // "eps",
+    // "fpx",
+    // "grabpay",
+    // "ideal",
+    // "interac_present",
+    // "klarna",
+    // "konbini",
+    // "link",
+    // "oxxo",
+    // "p24",
+    // "paynow",
+    // "paypal",
+    // "pix",
+    // "us_bank_account",
+    // "sepa_debit",
+    // "sofort",
+    // "us_bank_account",
+    // "wechat_pay",
+    // "zip",
+  ];
+
   try {
     let customerId;
     const { amount, currency, email } = req.body;
@@ -39,30 +74,33 @@ app.post("/payment-sheet", async (req, res) => {
       customerId = customer.id;
     }
 
-    // //   const customer = await stripe.customers.create();
+    //const customer = await stripe.customers.create();
     const ephemeralKey = await stripe.ephemeralKeys.create(
       { customer: customerId },
       { apiVersion: "2022-11-15" }
     );
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount,
       currency: currency,
       customer: customerId,
-      payment_method_types: ["card"],
+      // payment_method_types: paymenMethodsType,
+      automatic_payment_methods: {enabled: true},
     });
 
     res
       .json({
-        id:paymentIntent.id,
+        id: paymentIntent.id,
         paymentIntent: paymentIntent.client_secret,
         ephemeralKey: ephemeralKey.secret,
         customer: customerId,
-
-      }).status(200)
-      
+      })
+      .status(200);
   } catch (error) {
-      res.json({
-        error:error
-      }).status(400)
+    res
+      .json({
+        error: error,
+      })
+      .status(400);
   }
 });
